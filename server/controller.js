@@ -1,14 +1,29 @@
-let task1 = {name: 'Sweep the floor', priority: 'Low', status: true}
+const Sequelize = require('sequelize')
+const {CONNECTION_STRING} = process.env
 
-let task2 = {name: 'Get groceries', priority: 'Medium', status: true}
+const sequelize = new Sequelize(CONNECTION_STRING, {
+  dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+        rejectUnauthorized: false
+    }
+  }
+})
 
-let task3 = {name: 'Make dinner', priority: 'High', status: true}
-
-let tasks = [task1, task2, task3]
 
 module.exports = {
   getTasks: (req, res) => {
-    res.status(200).send(tasks)
+    sequelize.query(`SELECT * FROM tasks
+    ORDER BY status,
+      CASE priority
+        WHEN 'High' THEN 1
+        WHEN 'Medium' THEN 2
+        WHEN 'Low' THEN 3
+        ELSE 4
+      END;`)
+        .then(dbRes => {
+          res.status(200).send(dbRes[0])
+        })
   },
 
   addTask: (req, res) => {
