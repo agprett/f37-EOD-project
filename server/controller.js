@@ -31,10 +31,10 @@ module.exports = {
 
     let status = false
 
-    let newTask = {name, priority, status}
-
-    tasks.push(newTask)
-
-    res.sendStatus(200)
+    sequelize.query(`INSERT INTO tasks (name, priority, status)
+      VALUES ('${name}', '${priority}', ${status});
+    `)
+      .then(() => res.sendStatus(200))
+      .catch(() => res.sendStatus(500))
   }
 }
