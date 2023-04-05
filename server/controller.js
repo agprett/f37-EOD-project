@@ -10,7 +10,6 @@ const sequelize = new Sequelize(CONNECTION_STRING, {
   }
 })
 
-
 module.exports = {
   getTasks: (req, res) => {
     sequelize.query(`SELECT * FROM tasks
@@ -29,12 +28,30 @@ module.exports = {
   addTask: (req, res) => {
     const {name, priority} = req.body
 
-    let status = false
-
-    sequelize.query(`INSERT INTO tasks (name, priority, status)
-      VALUES ('${name}', '${priority}', ${status});
+    sequelize.query(`INSERT INTO tasks (name, priority)
+      VALUES ('${name}', '${priority}');
     `)
       .then(() => res.sendStatus(200))
       .catch(() => res.sendStatus(500))
+  },
+
+  updateTask: (req, res) => {
+    let {status} = req.body
+    let id = +req.body.id
+
+    sequelize.query(`UPDATE tasks
+      SET status = ${status}
+      WHERE task_id = ${id};
+    `)
+      .then(() => res.status(200).send('Task status updated!'))
+  },
+
+  deleteTask: (req, res) => {
+    const id = +req.params.id
+
+    sequelize.query(`DELETE FROM tasks
+      WHERE task_id = ${id}
+    `)
+      .then(() => res.status(200).send('Task deleted!'))
   }
 }
