@@ -1,5 +1,15 @@
 const newTaskForm = document.querySelector('form')
 
+const updateStatus = (id, status) => {
+  let body = {id, status}
+
+  axios.put(`http://localhost:6789/api/tasks`, body)
+    .then(res => {
+      console.log(res.data)
+      getTasks()
+    })
+}
+
 const deleteTask = (id) => {
   axios.delete(`http://localhost:6789/api/tasks/${id}`)
     .then(res => {
@@ -40,6 +50,14 @@ const buildTasks = (tasks) => {
     newTask.appendChild(trashCan)
 
     tasksDisplay.appendChild(newTask)
+
+    const allBoxes = document.getElementsByClassName('task-completed')
+    const lastBox = allBoxes[allBoxes.length - 1]
+
+    lastBox.addEventListener('change', () => {
+      console.log('fired update')
+      updateStatus(task.task_id, !task.status)
+    })
   })
 }
 
